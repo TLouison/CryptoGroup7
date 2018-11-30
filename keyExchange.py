@@ -1,8 +1,5 @@
-
-
-
-
-
+def diffieHellman():
+    
 
 def main():
     return "value"
