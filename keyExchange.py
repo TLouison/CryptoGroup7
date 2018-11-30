@@ -1,4 +1,35 @@
 import secrets
+
+def _try_composite(a, d, n, s):
+    if pow(a, d, n) == 1:
+        return False
+    for i in range(s):
+        if pow(a, 2**i * d, n) == n-1:
+            return False
+    return True # n  is definitely composite
+ 
+def is_prime(n, _precision_for_huge_n=16):
+    d, s = n - 1, 0
+    while not d % 2:
+        d, s = d >> 1, s + 1
+    if n < 1373653: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3))
+    if n < 25326001: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5))
+    if n < 118670087467: 
+        if n == 3215031751: 
+            return False
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7))
+    if n < 2152302898747: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11))
+    if n < 3474749660383: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13))
+    if n < 341550071728321: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13, 17))
+    # otherwise
+    return not any(_try_composite(a, d, n, s) 
+                   for a in _known_primes[:_precision_for_huge_n])
+
 def lcm(x, y):
     return abs(x*y) // math.gcd(x,y)
 
@@ -28,8 +59,14 @@ def diffieHellman(g, p, socket):
     return publicSecret
 
 def textBookRSA(socket):
-    p = secrets.randbits(256)
-    q = secrets.randbits(256)
+    while(True):
+        p = secrets.randbits(256)
+        if(is_prime(p)):
+            break
+    while(True):
+        q = secrets.randbits(256)
+        if(is_prime(q) and p!=q):
+            break
     N = p*q
     carmichael = lcm(p-1,q-1)
     e = 0
@@ -44,7 +81,9 @@ def semanticRSA(socket):
 
 
 def main():
+    _known_primes = []
     return "value"
 
 if __name__ == "__main__":
+    _known_primes = []
     diffieHellman(5, 23)
