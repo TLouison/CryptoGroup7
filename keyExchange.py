@@ -1,6 +1,16 @@
 import secrets
 import utility as util
 
+def staticDiffieHellman(g, p, socket):
+    secretNum = 24704502257117
+    print(secretNum)
+    publicKeyHalf = pow(g, secretNum, p)
+    print(publicKeyHalf)
+    socket.send(publicKeyHalf)
+    otherPublicKeyHalf = socket.recv(1024)
+    publicSecret pow(otherPublicKeyHalf, secretNum, p)
+    return publicSecret
+
 def EphemeralDiffieHellman(g, p, socket):
     secretNum = secrets.randbits(256)
     print(secretNum)
@@ -31,11 +41,11 @@ def textBookRSA(socket):
     return n, e, d
 
 def semanticRSA(socket):
+    textBookRSA()
+    k0 = 10
+    k1 = 11
+    
     return "Yener"
-
-def main():
-    _known_primes = []
-    return "value"
 
 if __name__ == "__main__":
     _known_primes = []
