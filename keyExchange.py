@@ -1,6 +1,11 @@
 import secrets
 import utility as util
 
+'''
+Key Distribution Options and Implementations
+
+Textbook RSA, Semantically Secure RSA, Static Diffie Hellman, Ephemeral Diffie Hellman
+'''
 def staticDiffieHellman(g, p, socket):
     secretNum = 24704502257117
     print(secretNum)

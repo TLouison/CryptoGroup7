@@ -1,5 +1,12 @@
 import hash
 
+'''
+Message Authentication Code
+
+HMAC
+'''
+
+
 def HMAC(k, m):
     blockSize = 64 #for SHA-1
     outerPad = '01011100'

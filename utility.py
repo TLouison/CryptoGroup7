@@ -1,3 +1,10 @@
+
+'''
+Utility Functions Created for SSL
+
+Primality Test, LCM, Modular Inverse, Composite Number Test, Extended Euclid GCD
+'''
+
 def _try_composite(a, d, n, s):
     if pow(a, d, n) == 1:
         return False
