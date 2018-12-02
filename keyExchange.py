@@ -40,12 +40,31 @@ def textBookRSA(socket):
     d = util.modinv(e, carmichael)
     return n, e, d
 
-def semanticRSA(socket):
-    textBookRSA()
+def semanticRSAEncrypt(m, socket):
+    n = 12
     k0 = 10
     k1 = 11
-    
-    return "Yener"
+    r = secrets.randbits(k0)
+    appendedM = m
+    while(len(appendedM) < n-k0):
+        appendedM += '0'
+    G = hash.sha(r)
+    X = m^G
+    H = hash.sha(X)
+    Y = r^H
+    mFinal = X+Y
+    return textBookRSA(mFinal)
+
+def semanticRSADecrypt(Y, X):
+    n = 12
+    k0 = 10
+    k1 = 11
+    H = hash.sha(X)
+    r = Y ^ H
+    G = hash.sha(r)
+    appendedM = X ^ G
+    m = appendedM[0:len(n)]
+
 
 if __name__ == "__main__":
     _known_primes = []
