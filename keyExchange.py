@@ -65,7 +65,6 @@ def semanticRSADecrypt(Y, X):
     appendedM = X ^ G
     m = appendedM[0:len(n)]
 
-
 if __name__ == "__main__":
     _known_primes = []
     diffieHellman(5, 23)
