@@ -56,7 +56,7 @@ def sha(msg):
         #Perfoming the SHA logical operations
         for i in range(80):
             if 0 <= i <= 19:
-                f = (b & c) | ((0b11111111111111111111111111111111 - b) & d)
+                f = (d ^ (b & (c ^ d)))
                 k = 0x5A827999
             elif 20 <= i <= 39:
                 f = b ^ c ^ d
@@ -68,7 +68,7 @@ def sha(msg):
                 f = b ^ c ^ d
                 k = 0xCA62C1D6
 
-            temp = leftRotate(a, 5) + f + e + k + w[i]
+            temp = leftRotate(a, 5) + f + e + k + w[i] & 0xffffffff
             e = d
             d = c
             c = leftRotate(b, 30)
