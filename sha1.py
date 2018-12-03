@@ -20,21 +20,23 @@ def sha1Ints(msg):
     h4 = 0xC3D2E1F0
 
     #Gathering len of original message and append a 1 to the new msg
-    m_length = bin(len(bin(msg)[2:]))[2:]
-    msg += 0x80
+    m_length = len(msg)
+    msg += '1'
 
-    #Padding to be congruent with -64 = 448 % 512
-    msg = bin(msg)[2:]
+    '''
+    while(len(m_length)<64):
+        m_length = '0' +m_length
+    m_length = m_length[32:] + m_length[:31]
+    '''
+    #Filling out the 512 bit msg with the 64-bit length
     for i in range(512):
-        if ((len(msg)+64) % 512 == 0):
+        if ((len(msg)+len(bin(m_length)[2:])) % 512 == 0):
             break
         msg += "0"
 
-    #Filling out the 512 bit msg with the 64-bit length
-    msg = int(msg + "{:}".format(m_length).rjust(64, "0"), 2)
-
+    msg += bin(m_length)[2:]
     #Chunking message into usable portions
-    chunkedMessage = util.chunkMessage(bin(msg)[2:], 512)
+    chunkedMessage = util.chunkMessage(msg, 512)
 
     for chunk in chunkedMessage:
         w = list(map(lambda x: int(x, 2), util.chunkMessage(chunk, 32)))
@@ -50,10 +52,11 @@ def sha1Ints(msg):
         d = h3
         e = h4
 
+        print(w)
         #Perfoming the SHA logical operations
         for i in range(80):
             if 0 <= i <= 19:
-                f = (b & c) | (~b & d)
+                f = (b & c) | ((0b11111111111111111111111111111111 - b) & d)
                 k = 0x5A827999
             elif 20 <= i <= 39:
                 f = b ^ c ^ d
@@ -71,6 +74,7 @@ def sha1Ints(msg):
             c = leftRotate(b, 30)
             b = a
             a = temp
+            print("i: %s A: %s B: %s C: %s D: %s E: %s" %(i,a,b,c,d,e))
         
         h0 += a
         h1 += b
@@ -82,5 +86,6 @@ def sha1Ints(msg):
 
 
 if __name__ == "__main__":
-    ans = sha1Ints(0b00000000010101010101101001010100001010101010101010101010101100101010001010101011101110101111111110100010010000101010000101000000)
+    print(len('01110100011001010111001101110100'))
+    ans = sha1Ints('01110100011001010111001101110100')
     print(bin(ans))
