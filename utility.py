@@ -45,3 +45,23 @@ def modinv(a, m):
     if g != 1:
         raise ValueError
     return x%m
+
+#Chunks a string into chunks of length n
+def chunkMessage(msg, n):
+    binary_list = []
+    buffer = ""
+
+    #Splitting the binary string into 8 bit sections
+    for i in range(len(msg)):
+        buffer += msg[i]
+
+        if len(buffer) == n:
+            binary_list.append(buffer)
+            buffer = ""
+
+    if len(buffer) < n and len(buffer) > 0:
+        while len(buffer) < n:
+            buffer += "0"
+        binary_list.append(buffer)
+
+    return binary_list
