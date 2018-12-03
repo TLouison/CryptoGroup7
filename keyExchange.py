@@ -65,6 +65,31 @@ def semanticRSADecrypt(Y, X):
     appendedM = X ^ G
     m = appendedM[0:len(n)]
 
+def main(socket, algorithm, option):
+    if algorithm == 'ephemeraldiffiehellman':
+        if option == 0:
+            g = secrets.randint(80)
+            p = secrets.randint(80)
+            socket.send(g)
+            socket.send(p)
+        else:
+            g = socket.recv(10)
+            p = socket.recv(10)
+        return g, p, EphemeralDiffieHellman(g, p, socket)
+
+    if algorithm == 'staticdiffiehellman':
+        if option == 0:
+            g = secrets.randint(80)
+            p = secrets.randint(80)
+            socket.send(g)
+            socket.send(p)
+        else:
+            g = socket.recv(10)
+            p = socket.recv(10)
+        return g, p, staticDiffieHellman(g, p, socket)
+    
+    if algorithm == 'textbookrsa':
+
 if __name__ == "__main__":
     _known_primes = []
     diffieHellman(5, 23)

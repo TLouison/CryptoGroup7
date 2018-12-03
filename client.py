@@ -164,7 +164,7 @@ while(True):
 
     '''
     #Phase 2
-    keyExchange(client)
+    keyExchange(client, keyExchange, 0)
 
 
     #Phase 3
