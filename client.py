@@ -1,13 +1,17 @@
 import socket
+import secrets
 
 client = socket.socket()
 
 def keyExchangePicker():
     keyExchangeList = ['staticdiffiehellman', 'ephemeraldiffiehellman']
+    choices = []
     while(True):
-        keyExchange = input("Pick a keyExchange method (): ")
+        keyExchange = input("Pick a keyExchange method ()[quit to exit]: ")
+        if keyExchange = 'quit':
+            return choices
         if keyExchange in keyExchangeList:
-            return keyExchange
+            choices.append(keyExchange)
         else:
             print("Invalid Key Exchange Algorithm")
 
@@ -15,19 +19,25 @@ def keyExchangePicker():
 
 def cipherSuitePicker():
     cipherSuiteList = ['des3', 'des', 'toydes']
+    choices = []
     while(True):
-        cipherSuite = input("Pick a cipher suite (): ")
+        cipherSuite = input("Pick a cipher suite ()[quit to exit]: ")
+        if cipherSuite = 'quit':
+            return choices
         if cipherSuite in cipherSuiteList:
-            return cipherSuite
+            choices.append(cipherSuite)
         else:
             print("Invalid Cipher Suite Algorithm")
 
 def hashPicker()
     hashList = ['sha1']
+    choices = []
     while(True):
         hashChoice = input("Pick a hash (): ")
+        if hashChoice = 'quit':
+            return choices
         if hashChoice in hashList:
-            return hashChoice
+            choices.append(hashChoice)
         else:
             print("Invalid hash Algorithm")
 
@@ -55,10 +65,22 @@ while(True):
     #Phase 1
     client.send(1024)
 
-    keyExchange = keyExchangePicker()
-    cipherSuite =  cipherSuitePicker()
-    hashChoice = hashPicker()
+    timestamp = #THIS NEEDS TO BE DONE
+    nonce = secrets.randbits(224)
 
+    keyExchanges = keyExchangePicker()
+    client.send(keyExchange)
+
+    cipherSuites =  cipherSuitePicker()
+    client.send(cipherSuite)
+
+    hashChoices = hashPicker()
+    client.send(hashChoices)
+
+    keyExchange = client.recv(1)
+    cipherSuite = client.recv(1)
+    hashChoice = client.recv(1)
+    '''
     while(True):
         client.send()
         client.recv(1024)
@@ -117,17 +139,17 @@ while(True):
         client.send()
         client.recv(1024)
 
-        if(serverCipherSuite != cipherSuite):
+        if(serverHashChoice != hashChoice):
             while(True):
                 res = input("Friend picked " + cipherSuite + " do you want to continue with this? (y/n): ")
                 if(res == 'y'):
-                    cipherSuite = serverCipherSuite
+                    hashChoice = serverHashChoice
                     break
                 elif(res == 'n'):
                     while(True):
                         res = input("Do you want to try and renegotiate? (y/n): ")
                         if(res == 'y'):
-                            cipherSuite = cipherSuitePicker()
+                            hashChoice = hashPicker()
                             break
                         elif(res == 'n'):
                             client.send('ABORT')
@@ -139,5 +161,10 @@ while(True):
                     print('Invalid option')
         else:
             break 
+
+    '''
     #Phase 2
-    
+    keyExchange(client)
+
+
+    #Phase 3
