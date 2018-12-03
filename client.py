@@ -22,7 +22,7 @@ def cipherSuitePicker():
         else:
             print("Invalid Cipher Suite Algorithm")
 
-def hashPicker()
+def hashPicker():
     hashList = ['sha1']
     while(True):
         hashChoice = input("Pick a hash (): ")
