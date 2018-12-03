@@ -90,7 +90,6 @@ def main(socket, algorithm, option):
     
     if algorithm == 'textbookrsa':
 
-
 if __name__ == "__main__":
     _known_primes = []
     diffieHellman(5, 23)
