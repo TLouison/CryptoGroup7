@@ -8,7 +8,7 @@ def staticDiffieHellman(g, p, socket):
     print(publicKeyHalf)
     socket.send(publicKeyHalf)
     otherPublicKeyHalf = socket.recv(1024)
-    publicSecret pow(otherPublicKeyHalf, secretNum, p)
+    publicSecret = pow(otherPublicKeyHalf, secretNum, p)
     return publicSecret
 
 def EphemeralDiffieHellman(g, p, socket):
@@ -18,7 +18,7 @@ def EphemeralDiffieHellman(g, p, socket):
     print(publicKeyHalf)
     socket.send(publicKeyHalf)
     otherPublicKeyHalf = socket.recv(1024)
-    publicSecret pow(otherPublicKeyHalf, secretNum, p)
+    publicSecret = pow(otherPublicKeyHalf, secretNum, p)
     return publicSecret
 
 def textBookRSA(socket):

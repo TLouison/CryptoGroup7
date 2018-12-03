@@ -11,7 +11,7 @@ def keyExchangePicker():
     choices = []
     while(True):
         keyExchange = input("Pick a keyExchange method ()[quit to exit]: ")
-        if keyExchange = 'quit':
+        if keyExchange == 'quit':
             return choices
         if keyExchange in keyExchangeList:
             choices.append(keyExchange)
@@ -25,7 +25,7 @@ def cipherSuitePicker():
     choices = []
     while(True):
         cipherSuite = input("Pick a cipher suite ()[quit to exit]: ")
-        if cipherSuite = 'quit':
+        if cipherSuite == 'quit':
             return choices
         if cipherSuite in cipherSuiteList:
             choices.append(cipherSuite)
@@ -37,7 +37,7 @@ def hashPicker():
     choices = []
     while(True):
         hashChoice = input("Pick a hash (): ")
-        if hashChoice = 'quit':
+        if hashChoice == 'quit':
             return choices
         if hashChoice in hashList:
             choices.append(hashChoice)
