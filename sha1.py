@@ -11,7 +11,7 @@ def leftShift(bits, n):
     return bits << n
 
 #real sha1 without string garbage
-def sha1Ints(msg):
+def sha(msg):
     #Defining required constants
     h0 = 0x67452301
     h1 = 0xEFCDAB89
