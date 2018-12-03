@@ -61,51 +61,38 @@ def hashPicker(clientHashChoice)
                     print('invalid choice')
     return choice
 
-while(True):
-    host = input("Friend's IP (127.0.0.1 if local): ")
-    try:
-        socket.inet_aton(host)
-        break
-    except socket.error:
-        print("Invalid IP address")
 
-while(True):
-    try:
-        port = int(input("Friend's port (12345 if they choose default or greater if custom): "))
-    except:
-        print("Invalid port provided")
-    
-    if(port<12345):
-        print("Invalid port provided")
-    else:
-        break
+if __name__ == '__main__':
+    port = 12345
+    server = server.socket()
+    server.bind(('', port))
+    server.listen(5)
+    while(True):
+        client, addr = server.accept()
+        print('Got a connection from ', addr)
 
-client.connect((host,port))
-while(True):
-    #Phase 1
-    client.send(1024)
+        #Phase 1
 
-    timestamp = #THIS NEEDS TO BE DONE
-    nonce = secrets.randbits(224)
+        timestamp = #THIS NEEDS TO BE DONE
+        nonce = secrets.randbits(224)
 
-    clientKeyExchanges = server.recv(1)
-    keyExchange = keyExchangePicker(clientKeyExchanges)
-    server.send(keyExchange)
+        clientKeyExchanges = client.recv(1)
+        keyExchange = keyExchangePicker(clientKeyExchanges)
+        client.send(keyExchange)
 
-    clientCipherSuites = server.recv(1)
-    cipherSuite =  cipherSuitePicker(clientCipherSuites)
-    server.send(cipherSuite)
+        clientCipherSuites = client.recv(1)
+        cipherSuite =  cipherSuitePicker(clientCipherSuites)
+        client.send(cipherSuite)
 
-    clientHashChoices = server.recv(1)
-    hashChoice = hashPicker(clientHashChoices)
-    server.send(hashChoices)
+        clientHashChoices = client.recv(1)
+        hashChoice = hashPicker(clientHashChoices)
+        client.send(hashChoices)
 
-    #Phase 2
-    keyExchange(client, keyExchange, 0)
+        #Phase 2
+        keyExchange.main(client, keyExchange, 0)
 
 
-    #Phase 3
+        #Phase 3 (might be uneeded)
 
 
-
-    #Phase 4
+        #Phase 4 
