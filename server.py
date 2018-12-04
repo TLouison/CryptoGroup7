@@ -80,17 +80,14 @@ if __name__ == '__main__':
         nonce = secrets.randbits(224)
 
         clientKeyExchanges = client.recv(3).decode()
-        print(clientKeyExchanges)
         keyExchanges, binary = keyExchangePicker(clientKeyExchanges)
         client.send(binary.encode())
 
         clientCipherSuites = client.recv(3).decode()
-        print(clientCipherSuites)
         cipherSuite, binary =  cipherSuitePicker(clientCipherSuites)
         client.send(binary.encode())
 
         clientHashChoices = client.recv(3).decode()
-        print(clientHashChoices)
         hashChoice, binary = hashPicker(clientHashChoices)
         client.send(binary.encode())
 
@@ -101,7 +98,6 @@ if __name__ == '__main__':
         print("You're in... waiting on buddies message")
         while(True):
             c = client.recv(1024).decode()
-            print(c)
             m = keyEncryption.main(client, cipherSuite, sessionInfo, c, False)
             print("%s: %s" %(addr, m))
             m = input('>>> ')

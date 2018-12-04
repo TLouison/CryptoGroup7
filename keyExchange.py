@@ -4,9 +4,7 @@ import math
 
 def staticDiffieHellman(g, p, socket): #Predefined public values
     secretNum = 24704502257117
-    print(secretNum)
     publicKeyHalf = pow(g, secretNum, p)
-    print(publicKeyHalf)
     socket.send(str(publicKeyHalf).encode())
     otherPublicKeyHalf = int(socket.recv(1024).decode())
     publicSecret = pow(otherPublicKeyHalf, secretNum, p)
@@ -14,9 +12,7 @@ def staticDiffieHellman(g, p, socket): #Predefined public values
 
 def EphemeralDiffieHellman(g, p, socket): #New public values everytime to protect message
     secretNum = secrets.randbits(256)
-    print(secretNum)
     publicKeyHalf = pow(g, secretNum, p)
-    print(publicKeyHalf)
     socket.send(str(publicKeyHalf).encode())
     otherPublicKeyHalf = int(socket.recv(1024).decode())
     publicSecret = pow(otherPublicKeyHalf, secretNum, p)
@@ -37,7 +33,6 @@ def RSAKeyGeneration(socket, option):
     d = float(1+carmichael)/e
     k = 1
     while(not d.is_integer()):
-        print(d)
         d = float(1+k*carmichael)/e
         k += 1
     d = int(d)
@@ -45,7 +40,6 @@ def RSAKeyGeneration(socket, option):
     e = int(socket.recv(1024).decode())
     socket.send(str(N).encode())
     n = int(socket.recv(1024).decode())
-    print('d: %s n: %s e: %s N: %s' %(d,n,e,N))
     return d, n, e, N
 
 def main(socket, algorithm, option):

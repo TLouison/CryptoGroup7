@@ -352,7 +352,6 @@ def encrypt(plaintext, k, rounds):
         cipher3 += encrypt64(i, k3)
 
 
-    print("Here is the encrypted cipher text:\n"+cipher3)
     return cipher3
 
 
@@ -437,7 +436,6 @@ def decrypt(cipher, k, rounds):
     for i in listobits:
         plaintext3 += decrypt64(i, k1)
 
-    print("Here is the decrypted plain text:\n"+plaintext3)
     return plaintext3
 
 def decrypt64(bits64, k):
@@ -484,25 +482,17 @@ def main(socket, cipherSuite, info, msg, encrypt):
         else:
             return decrypt(msg, info['sessionKey'], 1)
     elif(cipherSuite == 'textbookrsa'):
-        print(msg)
         if(encrypt):
-            print('Encrypt')
             msg = ''.join(format(ord(x), 'b') for x in msg)
             msg = int(msg,2)
-            print('msg: %s' %(msg))
             ans = textBookRSA(msg, info['publicKey'], info['n'])
-            print(ans)
             return textBookRSA(msg, info['publicKey'], info['n'])
         else:
-            print('Decrypt')
             msg = int(msg)
             ans = textBookRSA(msg, info['sessionKey'], info['N'])
-            print('ans: %s' %(ans))
             ans = bin(ans)[2:]
-            print(ans)
             while(len(ans) % 8 != 0):
                 ans = '0'+ans
-            print(len(ans))
             return util.text_from_bits(ans)
     elif(cipherSuite == 'semanticrsa'):
         return  
