@@ -72,10 +72,10 @@ def initPermute(S):
 
     return ''.join(P)
 
-def encryptDES():
-    return 
-
-# def decryptDES():
+def perm32(P):
+    s = ""
+    s = P[32: 1] + P[ 2: 5] + P[ 4: 5] + P[ 6: 9] + P[ 8: 9] + P[10:13] + P[12:13] + P[14:17] + P[16:17] + P[18:21] + P[20:21] + P[22:25] + P[24:25] + P[26:29] + P[28:29] + P[30: 1]
+    return s
 
 # this function returns the input left shifted once
 def left_shift(to_shift):
@@ -109,16 +109,17 @@ def inverseInitialP(initial_p):
 	return final_p
 
 # the following 2 functions act as the s boxes
-def s0(initial4bit):
+def s0(initial32bit):
 	# grab the letters at respective indices and concatenate and convert to base 2 int
-	row = int((initial4bit[1]+initial4bit[2]),2)
-	col = int((initial4bit[0]+initial4bit[3]),2)
+	row = int((initial32bit[1]+initial32bit[-1]),2)
+	col = int((initial32bit[2:-1]),2)
 
-	s0_box = [[1, 0, 3, 2],\
-			  [3, 2, 1, 0],\
-			  [0, 2, 1, 3],\
-			  [3, 1, 3, 2]]
+	s0_box = [ [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7]  \
+                [ 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8]\
+                [ 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0]\
+                [ 15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]]
 
+   
 	# get the value from s box of calculated row and col
 	s_val = s0_box[row][col]
 	# convert to binary
@@ -128,15 +129,15 @@ def s0(initial4bit):
 	return bin_sval[2:].zfill(2)
 
 
-def s1(initial4bit):
+def s1(initial32bit):
 	# grab the letters at respective indices and concatenate and convert to base 2 int
-	row = int((initial4bit[1]+initial4bit[2]),2)
-	col = int((initial4bit[0]+initial4bit[3]),2)
+	row = int((initial32bit[1]+initial32bit[-1]),2)
+	col = int((initial32bit[2:-1]),2)
 
-	s1_box = [[0, 1, 2, 3],\
-			  [2, 0, 1, 3],\
-			  [3, 0, 1, 0],\
-			  [2, 1, 0, 3]]
+	s1_box = [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10]    \
+                [ 3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5] \
+                [ 0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15]
+                [ 13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]]
 
 	# get the value from s box of calculated row and col
 	s_val = s1_box[row][col]
@@ -148,33 +149,27 @@ def s1(initial4bit):
 
 
 def f_func(x, k):
-	# first expand/permutate x
-	# 4 1 2 3
-	first_x = x[3] + x[0] + x[1] + x[2]
-
-	# 2 3 4 1
-	last_x = x[1] + x[2] + x[3] + x[0]
 
 	# concatenate and xor new value with key after converting to int base 2
-	total_p = first_x + last_x
+	total_p = perm32(x)
 	xor_ed = int(total_p,2) ^ int(k,2) 
 	xor_ed = "{:b}".format(xor_ed) # convert to binary
 
 	# make sure its still 4 digits
-	first4 = xor_ed[:4].zfill(4)
-	last4 = xor_ed[4:].zfill(4)
+	first = xor_ed[:32].zfill(32)
+	last = xor_ed[32:].zfill(32)
 
 	# pass to respective s boxes
-	s0_val = s0(first4)
-	s1_val = s1(last4)
+	s0_val = s0(first)
+	s1_val = s1(last)
 
 	# concatenate
 	sol = s0_val + s1_val
 
 	# last permutation
-	p4 = inverseInitialP(sol)
+	p = inverseInitialP(sol)
 
-	return p4
+	return p
 
 
 def generateKeys(key10bit):
@@ -225,32 +220,31 @@ def encrypt(plaintext, k1, k2):
 
 def encrypt64(bits64, k1, k2):
     # implement initial permutation
-	permutation = initial_p(bits64)
+	permutation = initPermute(bits64)
 
 	# split
-	first = permutation[:32]
-	last = permutation[32:]
+	first32 = permutation[:32]
+	last32 = permutation[32:]
 
 	# send the latter to the f function with first key
-	f_last4 = f_func(last, k1)
+	f_last32 = f_func(last32, k1)
 
 	# xor new value with key after converting to int base 2
-	xor1 = int(first,2) ^ int(f_last4,2) 
-	xor1 = "{:b}".format(xor1).zfill(4)
+	xor1 = int(first,2) ^ int(f_last32,2) 
+	xor1 = "{:b}".format(xor1).zfill(32)
 
 	# send to f function with second key
 	f_xor1 = f_func(xor1, k2)
 
 	# xor the returned value with the original latter half
-	xor2 = int(f_xor1,2) ^ int(last4,2) 
-	xor2 = "{:b}".format(xor2).zfill(4)
+	xor2 = int(f_xor1,2) ^ int(last32,2) 
+	xor2 = "{:b}".format(xor2).zfill(32)
 
 	# concatenate
 	final = str(xor2) + str(xor1) 
 
 	#final permutation
-	# 4 1 3 5 7 2 8 6
-	cipher_text = final[3] + final[0] + final[2] + final[4] + final[6] + final[1] + final[7] + final[5]
+	cipher_text = initPermute(final)
 
 
 def decrypt(cipher, k1, k2):
@@ -270,3 +264,31 @@ def decrypt(cipher, k1, k2):
     return plaintext
 
 def decrypt64(i, k1, k2):
+    # implement initial permutation
+	permutation = initPermute(bits64)
+
+	# split
+	first32 = permutation[:32]
+	last32 = permutation[32:]
+
+	# send the latter to the f function with second key
+	f_last32 = f_func(last32, k2)
+
+	# xor new value with key after converting to int base 2
+	xor1 = int(first4,2) ^ int(f_last32,2) 
+	xor1 = "{:b}".format(xor1).zfill(32)
+
+	# send to f function with first key
+	f_xor1 = f_func(xor1, k1)
+
+	# xor the returned value with the original latter half
+	xor2 = int(f_xor1,2) ^ int(last32,2) 
+	xor2 = "{:b}".format(xor2).zfill(32)
+
+	# concatenate
+	final = str(xor2) + str(xor1) 
+
+	# final permutation
+	plain_text = initPermute(final)
+	print("Here is the decrypted plain text: "+plain_text)
+	return plain_text
