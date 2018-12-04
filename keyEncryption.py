@@ -107,41 +107,41 @@ def inverseInitialP(initial_p):
 # the following 2 functions act as the s boxes
 def s0(initial32bit):
 	# grab the letters at respective indices and concatenate and convert to base 2 int
-	row = int((initial32bit[1]+initial32bit[-1]),2)
-	col = int((initial32bit[2:-1]),2)
-
-	s0_box = [ [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7]  \
-                [ 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8]\
-                [ 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0]\
+    row = int(initial32bit[1]+initial32bit[-1],2)
+    col = int(initial32bit[15:18],2)
+    
+    s0_box = [ [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],  \
+                [ 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],\
+                [ 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],\
                 [ 15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]]
 
-   
+
 	# get the value from s box of calculated row and col
-	s_val = s0_box[row][col]
+    s_val = s0_box[row][col]
 	# convert to binary
-	bin_sval = bin(s_val)
+    bin_sval = bin(s_val)
 
 	# return 4 bit val
-	return bin_sval[2:].zfill(2)
+    return bin_sval[2:].zfill(2)
 
 
 def s1(initial32bit):
 	# grab the letters at respective indices and concatenate and convert to base 2 int
-	row = int((initial32bit[1]+initial32bit[-1]),2)
-	col = int((initial32bit[2:-1]),2)
-
-	s1_box = [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10]    \
-                [ 3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5] \
-                [ 0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15]
+    row = int(initial32bit[1]+initial32bit[-1],2)
+    col = int(initial32bit[14:18],2)
+    
+    s1_box = [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10],    \
+                [ 3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5], \
+                [ 0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15], \
                 [ 13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]]
 
 	# get the value from s box of calculated row and col
-	s_val = s1_box[row][col]
-	# convert to binary
-	bin_sval = bin(s_val)
+    s_val = s1_box[row][col]
+	# convert to binary 
+    bin_sval = bin(s_val)
 
 	# return 4 bit val
-	return bin_sval[2:].zfill(2)
+    return bin_sval[2:].zfill(2)
 
 
 def f_func(x, k):
@@ -206,12 +206,52 @@ def encrypt(plaintext, k1, k2):
         tmp = "{:b}".format(tmp).zfill(64)
         listobits.append(tmp)
 
-    cipher = ""
+    cipher1 = ""
     for i in listobits:
-        cipher += encrypt64(i, k1, k2)
+        cipher1 += encrypt64(i, k1, k2)
 
-    print("Here is the encrypted cipher text: "+cipher)
-    return cipher
+
+
+
+    listobits = []
+    tmp = ""
+    for i in cipher1:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    if len(tmp)>0:
+        tmp = "{:b}".format(tmp).zfill(64)
+        listobits.append(tmp)
+
+    cipher2 = ""
+    for i in listobits:
+        cipher2 += encrypt64(i, k1, k2)
+
+
+
+
+
+    listobits = []
+    tmp = ""
+    for i in cipher2:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    if len(tmp)>0:
+        tmp = "{:b}".format(tmp).zfill(64)
+        listobits.append(tmp)
+
+    cipher3 = ""
+    for i in listobits:
+        cipher3 += encrypt64(i, k1, k2)
+
+
+    print("Here is the encrypted cipher text:\n"+cipher3)
+    return cipher3
 
 
 def encrypt64(bits64, k1, k2):
@@ -226,7 +266,7 @@ def encrypt64(bits64, k1, k2):
 	f_last32 = f_func(last32, k1)
 
 	# xor new value with key after converting to int base 2
-	xor1 = int(first,2) ^ int(f_last32,2) 
+	xor1 = int(first32,2) ^ int(f_last32,2) 
 	xor1 = "{:b}".format(xor1).zfill(32)
 
 	# send to f function with second key
@@ -238,28 +278,60 @@ def encrypt64(bits64, k1, k2):
 
 	# concatenate
 	final = str(xor2) + str(xor1) 
-
+    
 	#final permutation
-	cipher_text = initPermute(final)
+	return initPermute(final)
 
 
 def decrypt(cipher, k1, k2):
-	listobits = []
     tmp = ""
+    listobits = []
+    
     for i in cipher:
         tmp+=i
         if len(tmp) == 64:
             listobits.append(tmp)
             tmp = ""
 
-    plaintext = ""
+    plaintext1 = ""
     for i in listobits:
-        plaintext += decrypt64(i, k1, k2)
+        plaintext1 += decrypt64(i, k1, k2)
 
-    print("Here is the decrypted plain text: "+plaintext)
-    return plaintext
 
-def decrypt64(i, k1, k2):
+
+
+    tmp = ""
+    listobits = []
+    
+    for i in plaintext1:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    plaintext2 = ""
+    for i in listobits:
+        plaintext2 += decrypt64(i, k1, k2)
+
+
+
+    tmp = ""
+    listobits = []
+    
+    for i in plaintext2:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    plaintext3 = ""
+    for i in listobits:
+        plaintext3 += decrypt64(i, k1, k2)
+
+    print("Here is the decrypted plain text:\n"+plaintext3)
+    return plaintext3
+
+def decrypt64(bits64, k1, k2):
     # implement initial permutation
 	permutation = initPermute(bits64)
 
@@ -271,7 +343,7 @@ def decrypt64(i, k1, k2):
 	f_last32 = f_func(last32, k2)
 
 	# xor new value with key after converting to int base 2
-	xor1 = int(first4,2) ^ int(f_last32,2) 
+	xor1 = int(first32,2) ^ int(f_last32,2) 
 	xor1 = "{:b}".format(xor1).zfill(32)
 
 	# send to f function with first key
@@ -286,5 +358,13 @@ def decrypt64(i, k1, k2):
 
 	# final permutation
 	plain_text = initPermute(final)
-	print("Here is the decrypted plain text: "+plain_text)
+	
 	return plain_text
+
+
+if __name__ == "__main__":
+    k1 = '10010001101000101011001111000100110101011110011011110111111111110110111001011101010011000011101100101010000110010000100001000100110101011110011011110111100000001001000110100010101100111'
+    k2 = '10001001000100011001101000100010101010110011001110111011111111110111011011101110011001011101110101010100110011000100011000100010101010110011001110111000000000001000100100010001100110'
+
+    x = encrypt("0001000010110111011001111100001110010101101110000100010000001011", k1, k2)
+    y = decrypt(x, k1, k2)
