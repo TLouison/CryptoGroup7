@@ -73,8 +73,7 @@ def sha(msg):
             c = leftRotate(b, 30)
             b = a
             a = temp
-            print("i: %s A: %s B: %s C: %s D: %s E: %s" %(i,a,b,c,d,e))
-        
+
         #Adding the values to the current running total
         h0 += a
         h1 += b
