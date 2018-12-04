@@ -7,6 +7,7 @@ import utility as util
 def leftRotate(msg, n):
     return ((msg << n) | (msg >> (32 - n))) & 0xffffffff
 
+#Left shifts the bits
 def leftShift(bits, n):
     return bits << n
 
@@ -23,11 +24,6 @@ def sha(msg):
     m_length = len(msg)
     msg += '1'
 
-    '''
-    while(len(m_length)<64):
-        m_length = '0' +m_length
-    m_length = m_length[32:] + m_length[:31]
-    '''
     #Filling out the 512 bit msg with the 64-bit length
     for i in range(512):
         if ((len(msg)+len(bin(m_length)[2:])) % 512 == 0):
@@ -38,6 +34,7 @@ def sha(msg):
     #Chunking message into usable portions
     chunkedMessage = util.chunkMessage(msg, 512)
 
+    #Getting hash values for each 512 bit chunk
     for chunk in chunkedMessage:
         w = list(map(lambda x: int(x, 2), util.chunkMessage(chunk, 32)))
         while len(w) < 80:
@@ -46,15 +43,16 @@ def sha(msg):
         for i in range(16, 80):
             w[i] = leftRotate( w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i - 16], 1)
 
+        #Defaulting a-e to the running totals h0-h4
         a = h0
         b = h1
         c = h2
         d = h3
         e = h4
 
-        print(w)
         #Perfoming the SHA logical operations
         for i in range(80):
+            #Determining which f and k to use
             if 0 <= i <= 19:
                 f = (d ^ (b & (c ^ d)))
                 k = 0x5A827999
@@ -68,6 +66,7 @@ def sha(msg):
                 f = b ^ c ^ d
                 k = 0xCA62C1D6
 
+            #Updating values
             temp = leftRotate(a, 5) + f + e + k + w[i] & 0xffffffff
             e = d
             d = c
@@ -76,12 +75,14 @@ def sha(msg):
             a = temp
             print("i: %s A: %s B: %s C: %s D: %s E: %s" %(i,a,b,c,d,e))
         
+        #Adding the values to the current running total
         h0 += a
         h1 += b
         h2 += c
         h3 += d
         h4 += e
 
+    #Performing bitwise operations to create a 160-bit digest
     return leftShift(h0, 128) | leftShift(h1, 96) | leftShift(h2, 64) | leftShift(h3, 32) | h4
 
 
