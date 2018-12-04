@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 def initPermute(S):
     P = [0]*64
 
@@ -76,7 +75,6 @@ def encryptDES():
 
 if __name__ == "__main__":
     print(initPermute("0001000010110111011001111100001110010101101110000100010000001011"))
-=======
 # this function returns the input left shifted once
 def left_shift(to_shift):
 	tmp = to_shift[0]
@@ -270,4 +268,3 @@ def decrypt(cipher, k1, k2):
     return plaintext
 
 def decrypt64(i, k1, k2):
->>>>>>> a0a4c5cd3008acb12ab7a994585f882265eb5895
