@@ -42,7 +42,7 @@ def cipherSuitePicker(clientCipherSuite):
                     print('invalid choice')
     return choice
 
-def hashPicker(clientHashChoice)
+def hashPicker(clientHashChoice):
     hashList = ['sha1']
     choice = ''
     for i in range(0,len(clientHashChoice)):
