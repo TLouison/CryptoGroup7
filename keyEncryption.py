@@ -105,16 +105,17 @@ def inverseInitialP(initial_p):
 	return final_p
 
 # the following 2 functions act as the s boxes
-def s0(initial4bit):
+def s0(initial32bit):
 	# grab the letters at respective indices and concatenate and convert to base 2 int
-	row = int((initial4bit[1]+initial4bit[2]),2)
-	col = int((initial4bit[0]+initial4bit[3]),2)
+	row = int((initial32bit[1]+initial32bit[-1]),2)
+	col = int((initial32bit[2:-1]),2)
 
-	s0_box = [[1, 0, 3, 2],\
-			  [3, 2, 1, 0],\
-			  [0, 2, 1, 3],\
-			  [3, 1, 3, 2]]
+	s0_box = [ [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7]  \
+                [ 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8]\
+                [ 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0]\
+                [ 15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]]
 
+   
 	# get the value from s box of calculated row and col
 	s_val = s0_box[row][col]
 	# convert to binary
@@ -124,15 +125,15 @@ def s0(initial4bit):
 	return bin_sval[2:].zfill(2)
 
 
-def s1(initial4bit):
+def s1(initial32bit):
 	# grab the letters at respective indices and concatenate and convert to base 2 int
-	row = int((initial4bit[1]+initial4bit[2]),2)
-	col = int((initial4bit[0]+initial4bit[3]),2)
+	row = int((initial32bit[1]+initial32bit[-1]),2)
+	col = int((initial32bit[2:-1]),2)
 
-	s1_box = [[0, 1, 2, 3],\
-			  [2, 0, 1, 3],\
-			  [3, 0, 1, 0],\
-			  [2, 1, 0, 3]]
+	s1_box = [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10]    \
+                [ 3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5] \
+                [ 0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15]
+                [ 13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]]
 
 	# get the value from s box of calculated row and col
 	s_val = s1_box[row][col]
