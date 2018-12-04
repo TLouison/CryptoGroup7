@@ -417,6 +417,7 @@ if __name__ == "__main__":
     y = decrypt(x, k1, k2)
 
 
+
 def main(socket, cipherSuite, info, msg, encrypt):
     if(cipherSuite == '3des'): #Need to see DES implementation first
         if(encrypt):
