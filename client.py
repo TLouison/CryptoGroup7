@@ -7,7 +7,7 @@ def keyExchangePicker():
     keyExchangeList = ['staticdiffiehellman', 'ephemeraldiffiehellman', 'rsakeygeneration']
     choices = ['0', '0', '0']
     while(True):
-        keyExchangeChoice = input("Pick a keyExchange method ()[quit to exit]: ")
+        keyExchangeChoice = input("Pick a keyExchange method (staticdiffiehellman, ephemeraldiffiehellman, rsakeygeneration)[quit to exit]: ")
         if keyExchangeChoice == 'quit':
             tmp = ''
             for i in choices:
@@ -27,7 +27,7 @@ def cipherSuitePicker():
     cipherSuiteList = ['des3', 'des', 'textbookrsa']
     choices = ['0','0','0']
     while(True):
-        cipherSuite = input("Pick a cipher suite ()[quit to exit]: ")
+        cipherSuite = input("Pick a cipher suite (des3, des, textbookrsa)[quit to exit]: ")
         if cipherSuite == 'quit':
             tmp = ''
             for i in choices:
@@ -46,7 +46,7 @@ def hashPicker():
     hashList = ['sha1']
     choices = ['0']
     while(True):
-        hashChoice = input("Pick a hash (): ")
+        hashChoice = input("Pick a hash (sha1): ")
         if hashChoice == 'quit':
             tmp = ''
             for i in choices:
