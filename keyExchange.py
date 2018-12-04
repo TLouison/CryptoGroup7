@@ -1,26 +1,14 @@
 import secrets
 import utility as util
-import sha1
-
-def i2osp(integer, size=4):
-  return ''.join([chr((integer >> (8 * i)) & 0xFF) for i in reversed(range(size))])
-
-def mgf1(msg, length):
-    output = ''
-    counter = 0
-    while(len(output) < length):
-        C = i2osp(counter, 4)
-        output += sha1.sha(msg+C)
-        count += 1
-    return output[:lengh]
+import math
 
 def staticDiffieHellman(g, p, socket):
     secretNum = 24704502257117
     print(secretNum)
     publicKeyHalf = pow(g, secretNum, p)
     print(publicKeyHalf)
-    socket.send(publicKeyHalf)
-    otherPublicKeyHalf = socket.recv(1024)
+    socket.send(str(publicKeyHalf).encode())
+    otherPublicKeyHalf = int(socket.recv(1024).decode())
     publicSecret = pow(otherPublicKeyHalf, secretNum, p)
     return publicSecret
 
@@ -29,12 +17,12 @@ def EphemeralDiffieHellman(g, p, socket):
     print(secretNum)
     publicKeyHalf = pow(g, secretNum, p)
     print(publicKeyHalf)
-    socket.send(publicKeyHalf)
-    otherPublicKeyHalf = socket.recv(1024)
+    socket.send(str(publicKeyHalf).encode())
+    otherPublicKeyHalf = int(socket.recv(1024).decode())
     publicSecret = pow(otherPublicKeyHalf, secretNum, p)
     return publicSecret
 
-def RSAKeyGeneration(socket):
+def RSAKeyGeneration(socket, option):
     while(True):
         p = secrets.randbits(256)
         if(util.is_prime(p)):
@@ -51,61 +39,42 @@ def RSAKeyGeneration(socket):
         if(e != 1 and math.gcd(e,carmichael)==1):
             break   
     d = util.modinv(e, carmichael)
-    socket.send(e)
-    e = socket.recv(1024)
-    socket.send(N)
-    n = socket.recv(1024)
-    return n, d, e
-
-def semanticRSAEncrypt(m, socket):
-    n = 12
-    k0 = 10
-    k1 = 11
-    r = secrets.randbits(k0)
-    appendedM = m
-    while(len(appendedM) < n-k0):
-        appendedM += '0'
-    G = sha1.sha(r)
-    X = m^G
-    H = sha1.sha(X)
-    Y = r^H
-    mFinal = X+Y
-    return textBookRSA(mFinal)
-
-def semanticRSADecrypt(Y, X):
-    n = 12
-    k0 = 10
-    k1 = 11
-    H = sha1.sha(X)
-    r = Y ^ H
-    G = sha1.sha(r)
-    appendedM = X ^ G
-    m = appendedM[0:len(n)]
+    socket.send(str(e).encode())
+    e = int(socket.recv(1024).decode())
+    socket.send(str(N).encode())
+    n = int(socket.recv(1024).decode())
+    print('d: %s n: %s e: %s N: %s' %(d,n,e,N))
+    return d, n, e, N
 
 def main(socket, algorithm, option):
+    info = dict()
     if algorithm == 'ephemeraldiffiehellman':
         if option == 0:
-            g = secrets.randint(80)
-            p = secrets.randint(80)
-            socket.send(g)
-            socket.send(p)
+            g = secrets.randbits(80)
+            p = secrets.randbits(80)
+            socket.send(str(g).encode())
+            socket.send(str(p).encode())
         else:
-            g = socket.recv(10)
-            p = socket.recv(10)
-        return g, p, EphemeralDiffieHellman(g, p, socket)
+            g = int(socket.recv(2000).decode())
+            p = int(socket.recv(2000).decode())
+        info['sessionKey'], info['n'] = EphemeralDiffieHellman(g, p, socket), p    
+        return info
 
     if algorithm == 'staticdiffiehellman':
         if option == 0:
-            g = secrets.randint(80)
-            p = secrets.randint(80)
-            socket.send(g)
-            socket.send(p)
+            g = 642201221879453301923991
+            p = 20038108183259
+            socket.send(str(g).encode())
+            socket.send(str(p).encode())
         else:
-            g = socket.recv(10)
-            p = socket.recv(10)
-        return g, p, staticDiffieHellman(g, p, socket)
+            g = int(socket.recv(2000).decode())
+            p = int(socket.recv(2000).decode())
+        info['sessionKey'], info['n'] = staticDiffieHellman(g, p, socket), p
+        return info
     
-    if algorithm == 'textbookrsa':
+    if algorithm == 'rsakeygeneration':
+        info['sessionKey'], info['n'], info['publicKey'], info['N'] = RSAKeyGeneration(socket, option)
+        return info
 
 if __name__ == "__main__":
     _known_primes = []

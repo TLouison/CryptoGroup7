@@ -1,7 +1,7 @@
 #Implementation of SHA-1
 #Written by Todd Louison
-import secrets
 import utility as util
+import secrets
 
 #Left rotates the given bitstring by n
 def leftRotate(msg, n):

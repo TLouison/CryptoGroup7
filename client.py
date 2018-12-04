@@ -1,46 +1,59 @@
-import socket
-import secrets
 import keyEncryption
 import keyExchange
-
-
-client = socket.socket()
+import socket
+import secrets
 
 def keyExchangePicker():
-    keyExchangeList = ['staticdiffiehellman', 'ephemeraldiffiehellman']
-    choices = []
+    keyExchangeList = ['staticdiffiehellman', 'ephemeraldiffiehellman', 'rsakeyexchange']
+    choices = ['0', '0', '0']
     while(True):
-        keyExchange = input("Pick a keyExchange method ()[quit to exit]: ")
-        if keyExchange == 'quit':
-            return choices
-        if keyExchange in keyExchangeList:
-            choices.append(keyExchange)
+        keyExchangeChoice = input("Pick a keyExchange method ()[quit to exit]: ")
+        if keyExchangeChoice == 'quit':
+            tmp = ''
+            for i in choices:
+                tmp += i
+            return tmp
+        elif keyExchangeChoice == 'staticdiffiehellman':
+            choices[0] = '1'
+        elif keyExchangeChoice == 'ephemeraldiffiehellman':
+            choices[1] = '1'
+        elif keyExchangeChoice == 'rsakeyexchange':
+            choices[2] = '1'
         else:
             print("Invalid Key Exchange Algorithm")
 
 
-
 def cipherSuitePicker():
-    cipherSuiteList = ['des3', 'des', 'toydes']
-    choices = []
+    cipherSuiteList = ['des3', 'des', 'rsa']
+    choices = ['0','0','0']
     while(True):
         cipherSuite = input("Pick a cipher suite ()[quit to exit]: ")
         if cipherSuite == 'quit':
-            return choices
-        if cipherSuite in cipherSuiteList:
-            choices.append(cipherSuite)
+            tmp = ''
+            for i in choices:
+                tmp += i
+            return tmp
+        elif cipherSuite == 'des3':
+            choices[0] = '1'
+        elif cipherSuite == 'des':
+            choices[1] = '1'
+        elif cipherSuite == 'rsa':
+            choices[2] = '1'
         else:
             print("Invalid Cipher Suite Algorithm")
 
 def hashPicker():
     hashList = ['sha1']
-    choices = []
+    choices = ['0']
     while(True):
         hashChoice = input("Pick a hash (): ")
         if hashChoice == 'quit':
-            return choices
-        if hashChoice in hashList:
-            choices.append(hashChoice)
+            tmp = ''
+            for i in choices:
+                tmp += i
+            return tmp
+        elif hashChoice == 'sha1':
+            choices[0] = '1'
         else:
             print("Invalid hash Algorithm")
 
@@ -54,47 +67,62 @@ if __name__ == '__main__':
         except socket.error:
             print("Invalid IP address")
 
-    port = 12345
-    '''
-    while(True):
-        try:
-            port = int(input("Friend's port (12345 if they choose default or greater if custom): "))
-        except:
-            print("Invalid port provided")
-        
-        if(port<12345):
-            print("Invalid port provided")
-        else:
-            break
-    '''
+    port = int(input('port: '))
 
+    client = socket.socket()
     client.connect((host,port))
     while(True):
         #Phase 1
-        client.send(1024)
+        #client.send(1024)
 
-        timestamp = #THIS NEEDS TO BE DONE
+        #timestamp #THIS NEEDS TO BE DONE
         nonce = secrets.randbits(224)
 
         keyExchanges = keyExchangePicker()
-        client.send(keyExchange)
+        client.send(keyExchanges.encode())
 
         cipherSuites =  cipherSuitePicker()
-        client.send(cipherSuite)
+        client.send(cipherSuites.encode())
 
         hashChoices = hashPicker()
-        client.send(hashChoices)
+        client.send(hashChoices.encode())
 
-        keyExchange = client.recv(1)
-        cipherSuite = client.recv(1)
-        hashChoice = client.recv(1)
+        keyExchanges = client.recv(3).decode()
+        cipherSuites = client.recv(3).decode()
+        hashChoices = client.recv(3).decode()
+
+        while(True):
+            if(keyExchanges[0] == '1'):
+                currentkey = 'staticdiffiehellman'
+            elif(keyExchanges[1] == '1'):
+                currentkey = 'ephemeraldiffiehellman'
+            elif(keyExchanges[2] == '1'):
+                currentkey = 'rsakeygeneration'
+            break
         
-        #Phase 2
-        keyExchange.main(client, keyExchange, 0)
+        while(True):
+            if(cipherSuites[0] == '1'):
+                currentSuite = '3des'
+            elif(cipherSuites[1] == '1'):
+                currentSuite = 'des'
+            elif(cipherSuites[2] == '1'):
+                currentSuite = 'textbookrsa'
+            break
 
-
-        #Phase 3 (might be uneeded?)
-        keyEncryption.main()
-
+        while(True):
+            if(hashChoices[0] == '1'):
+                currentHash = 'sha1'        
+            break
+            
+        #Phase 3 
+        sessionInfo = keyExchange.main(client, currentkey, 0)
 
         #Phase 4
+        print("You're in... talk how you like")
+        while(True):
+            m = input('>>> ')
+            c = keyEncryption.main(client, currentSuite, sessionInfo, m, True)
+            client.send(str(c).encode())
+            c = str(client.recv(1024).decode())
+            m = keyEncryption.main(client, currentSuite, sessionInfo, c, False)
+            print("%s: %s" %(host, m))

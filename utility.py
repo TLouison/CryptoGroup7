@@ -1,3 +1,5 @@
+import math
+
 def _try_composite(a, d, n, s):
     if pow(a, d, n) == 1:
         return False
@@ -7,6 +9,7 @@ def _try_composite(a, d, n, s):
     return True # n  is definitely composite
  
 def is_prime(n, _precision_for_huge_n=16):
+    _known_primes = []
     d, s = n - 1, 0
     while not d % 2:
         d, s = d >> 1, s + 1
