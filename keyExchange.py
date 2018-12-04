@@ -2,7 +2,7 @@ import secrets
 import utility as util
 import math
 
-def staticDiffieHellman(g, p, socket):
+def staticDiffieHellman(g, p, socket): #Predefined public values
     secretNum = 24704502257117
     print(secretNum)
     publicKeyHalf = pow(g, secretNum, p)
@@ -12,7 +12,7 @@ def staticDiffieHellman(g, p, socket):
     publicSecret = pow(otherPublicKeyHalf, secretNum, p)
     return publicSecret
 
-def EphemeralDiffieHellman(g, p, socket):
+def EphemeralDiffieHellman(g, p, socket): #New public values everytime to protect message
     secretNum = secrets.randbits(256)
     print(secretNum)
     publicKeyHalf = pow(g, secretNum, p)
@@ -22,7 +22,7 @@ def EphemeralDiffieHellman(g, p, socket):
     publicSecret = pow(otherPublicKeyHalf, secretNum, p)
     return publicSecret
 
-def RSAKeyGeneration(socket, option):
+def RSAKeyGeneration(socket, option): 
     while(True):
         p = secrets.randbits(256)
         if(util.is_prime(p)):
@@ -33,12 +33,14 @@ def RSAKeyGeneration(socket, option):
             break
     N = p*q
     carmichael = util.lcm(p-1,q-1)
-    e = 0
-    while(True):
-        e = secrets.randbelow(carmichael)
-        if(e != 1 and math.gcd(e,carmichael)==1):
-            break   
-    d = util.modinv(e, carmichael)
+    e = 65537
+    d = float(1+carmichael)/e
+    k = 1
+    while(not d.is_integer()):
+        print(d)
+        d = float(1+k*carmichael)/e
+        k += 1
+    d = int(d)
     socket.send(str(e).encode())
     e = int(socket.recv(1024).decode())
     socket.send(str(N).encode())

@@ -41,34 +41,6 @@ def semanticRSADecrypt(Y, X):
 def textBookRSA(m, k, n):
     return pow(m, k, n)
 
-def main(socket, cipherSuite, info, msg, encrypt):
-    if(cipherSuite == '3des'): #Need to see DES implementation first
-        return tripleDES(info['sessionKey'], msg)
-    elif(cipherSuite == 'des'): #Need to see DES implementation first
-        return DES(info['sessionKey'], msg)
-    elif(cipherSuite == 'textbookrsa'):
-        print(msg)
-        if(encrypt):
-            print('Encrypt')
-            msg = ''.join(format(ord(x), 'b') for x in msg)
-            msg = int(msg,2)
-            print('msg: %s' %(msg))
-            ans = textBookRSA(msg, info['publicKey'], info['n'])
-            print(ans)
-            return textBookRSA(msg, info['publicKey'], info['n'])
-        else:
-            print('Decrypt')
-            msg = int(msg)
-            ans = textBookRSA(msg, info['sessionKey'], info['N'])
-            print('ans: %s' %(ans))
-            ans = bin(ans)[2:]
-            print(ans)
-            while(len(ans) % 8 != 0):
-                ans = '0'+ans
-            print(len(ans))
-            return util.text_from_bits(ans)
-    elif(cipherSuite == 'semanticrsa'):
-        return 'sadf'
 def initPermute(S):
     P = [0]*64
 
@@ -443,3 +415,39 @@ if __name__ == "__main__":
 
     x = encrypt("0001000010110111011001111100001110010101101110000100010000001011", k1, k2)
     y = decrypt(x, k1, k2)
+
+
+def main(socket, cipherSuite, info, msg, encrypt):
+    if(cipherSuite == '3des'): #Need to see DES implementation first
+        if(encrypt):
+            return encrypt(msg, info['sessionKey'], 3)
+        else:
+            return decrypt(msg, info['sessionKey'], 3)
+    elif(cipherSuite == 'des'): #Need to see DES implementation first
+        if(encrypt):
+            return encrypt(msg, info['sessionKey'], 1)
+        else:
+            return decrypt(msg, info['sessionKey'], 1)
+    elif(cipherSuite == 'textbookrsa'):
+        print(msg)
+        if(encrypt):
+            print('Encrypt')
+            msg = ''.join(format(ord(x), 'b') for x in msg)
+            msg = int(msg,2)
+            print('msg: %s' %(msg))
+            ans = textBookRSA(msg, info['publicKey'], info['n'])
+            print(ans)
+            return textBookRSA(msg, info['publicKey'], info['n'])
+        else:
+            print('Decrypt')
+            msg = int(msg)
+            ans = textBookRSA(msg, info['sessionKey'], info['N'])
+            print('ans: %s' %(ans))
+            ans = bin(ans)[2:]
+            print(ans)
+            while(len(ans) % 8 != 0):
+                ans = '0'+ans
+            print(len(ans))
+            return util.text_from_bits(ans)
+    elif(cipherSuite == 'semanticrsa'):
+        return  
