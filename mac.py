@@ -7,10 +7,14 @@ def HMAC(k, m):
 
     if(len(k) > blockSize):
         sha1.sha(k)
-    while outerPad < blockSize and innerPad < blockSize
     
-    outerPadKey = k ^ outerPad
-    innerPadKey = k ^ innerPad
+    outerPadKey = int(k,2) ^ int(outerPad,2)
+    innerPadKey = int(k,2) ^ int(innerPad,2)
 
-    hMAC = sha1.sha(outerPadKey + sha1.sh(innerPadKey + m))
+    hMAC = sha1.sha( bin(outerPadKey + sha1.sha( bin(innerPadKey + int(m,2))[2:]) )[2:])
     return hMAC
+
+if __name__ == "__main__":
+    ans = hex(HMAC("0", "0"))[2:]
+    print(ans)
+    print(len(ans))
