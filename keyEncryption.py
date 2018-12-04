@@ -128,23 +128,35 @@ def encrypt(plaintext, k1, k2):
     tmp = ""
     for i in plaintext:
         tmp+=i
-        if len(tmp)
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    if len(tmp)>0:
+        tmp = "{:b}".format(tmp).zfill(64)
+        listobits.append(tmp)
+
+    cipher = ""
+    for i in listobits:
+        cipher += encrypt64(i, k1, k2)
+
+    print("Here is the encrypted cipher text: "+cipher)
+    return cipher
 
 
-
-
-	# implement initial permutation
-	perm8 = initial_p(plaintext)
+def encrypt64(bits64, k1, k2):
+    # implement initial permutation
+	permutation = initial_p(bits64)
 
 	# split
-	first4 = perm8[:4]
-	last4 = perm8[4:]
+	first = permutation[:32]
+	last = permutation[32:]
 
 	# send the latter to the f function with first key
-	f_last4 = f_func(last4, k1)
+	f_last4 = f_func(last, k1)
 
 	# xor new value with key after converting to int base 2
-	xor1 = int(first4,2) ^ int(f_last4,2) 
+	xor1 = int(first,2) ^ int(f_last4,2) 
 	xor1 = "{:b}".format(xor1).zfill(4)
 
 	# send to f function with second key
@@ -160,36 +172,22 @@ def encrypt(plaintext, k1, k2):
 	#final permutation
 	# 4 1 3 5 7 2 8 6
 	cipher_text = final[3] + final[0] + final[2] + final[4] + final[6] + final[1] + final[7] + final[5]
-	print("Here is the encrypted cipher text: "+cipher_text)
-	return cipher_text
 
 
-def decrypt(cipher8bit, k1, k2):
-	# implement initial permutation
-	perm8 = initial_p(cipher8bit)
+def decrypt(cipher, k1, k2):
+	listobits = []
+    tmp = ""
+    for i in cipher:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
 
-	# split
-	first4 = perm8[:4]
-	last4 = perm8[4:]
+    plaintext = ""
+    for i in listobits:
+        plaintext += decrypt64(i, k1, k2)
 
-	# send the latter to the f function with second key
-	f_last4 = f_func(last4, k2)
+    print("Here is the decrypted plain text: "+plaintext)
+    return plaintext
 
-	# xor new value with key after converting to int base 2
-	xor1 = int(first4,2) ^ int(f_last4,2) 
-	xor1 = "{:b}".format(xor1).zfill(4)
-
-	# send to f function with first key
-	f_xor1 = f_func(xor1, k1)
-
-	# xor the returned value with the original latter half
-	xor2 = int(f_xor1,2) ^ int(last4,2) 
-	xor2 = "{:b}".format(xor2).zfill(4)
-
-	# concatenate
-	final = str(xor2) + str(xor1) 
-
-	# 4 1 3 5 7 2 8 6
-	plain_text = final[3] + final[0] + final[2] + final[4] + final[6] + final[1] + final[7] + final[5]
-	print("Here is the decrypted plain text: "+plain_text)
-	return plain_text
+def decrypt64(i, k1, k2):
