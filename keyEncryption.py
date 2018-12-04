@@ -227,38 +227,74 @@ def generateKeys(key80bit):
             pts+=p10(tmp)
             tmp = ""
 
-	first = perm10[:40]
-	last = perm10[40:]
-
+    last = perm10[40:]
+    first = perm10[:40]
 	# shift left and find k1
-	shifted_first = left_shift(first)
-	shifted_last = left_shift(last)
+    shifted_first = left_shift(first)
+    shifted_last = left_shift(last)
 
-	k1 = (shifted_first + shifted_last)
+    k1 = (shifted_first + shifted_last)
 
     # shift left and find k2
-	shifted_first = left_shift(shifted_first)
-	shifted_last = left_shift(shifted_last)
-
-	shifted_first = left_shift(shifted_first)
-	shifted_last = left_shift(shifted_last)
-
-	k2 = (shifted_first + shifted_last)
+    shifted_first = left_shift(shifted_first)
+    shifted_last = left_shift(shifted_last)
 
     shifted_first = left_shift(shifted_first)
-	shifted_last = left_shift(shifted_last)
+    shifted_last = left_shift(shifted_last)
 
-	k3 = (shifted_first + shifted_last)
+    k2 = (shifted_first + shifted_last)
 
-	return k1, k2, k3
+    shifted_first = left_shift(shifted_first)
+    shifted_last = left_shift(shifted_last)
+
+    k3 = (shifted_first + shifted_last)
+
+    return k1, k2, k3
 
 
+def singleDESencrypt(k):
+    listobits = []
+    tmp = ""
+    for i in plaintext:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    if len(tmp)>0:
+        tmp = "{:b}".format(tmp).zfill(64)
+        listobits.append(tmp)
+
+    cipher1 = ""
+    for i in listobits:
+        cipher1 += encrypt64(i, k)
+    return cipher1
+
+def singleDESdecrypt(k):
+    listobits = []
+    tmp = ""
+    for i in plaintext:
+        tmp+=i
+        if len(tmp) == 64:
+            listobits.append(tmp)
+            tmp = ""
+
+    if len(tmp)>0:
+        tmp = "{:b}".format(tmp).zfill(64)
+        listobits.append(tmp)
+
+    cipher1 = ""
+    for i in listobits:
+        cipher1 += decrypt64(i, k)
+    return cipher1
 
 def encrypt(plaintext, k, rounds):
 
     k1, k2, k3 = generateKeys(k)
 
-    
+    if rounds > 1:
+        c = singleDESencrypt(k1)
+        return c
 
     listobits = []
     tmp = ""
@@ -353,6 +389,10 @@ def decrypt(cipher, k, rounds):
 
     k1, k2, k3 = generateKeys(k)
 
+    if rounds > 1:
+        p = singleDESdecrypt(k1)
+        return p
+
     tmp = ""
     listobits = []
     
@@ -430,13 +470,6 @@ def decrypt64(bits64, k):
 	
 	return plain_text
 
-
-if __name__ == "__main__":
-    k1 = '10010001101000101011001111000100110101011110011011110111111111110110111001011101010011000011101100101010000110010000100001000100110101011110011011110111100000001001000110100010101100111'
-    k2 = '10001001000100011001101000100010101010110011001110111011111111110111011011101110011001011101110101010100110011000100011000100010101010110011001110111000000000001000100100010001100110'
-
-    x = encrypt("0001000010110111011001111100001110010101101110000100010000001011", k1, k2)
-    y = decrypt(x, k1, k2)
 
 
 def main(socket, cipherSuite, info, msg, encrypt):
