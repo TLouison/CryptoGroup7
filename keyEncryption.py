@@ -243,32 +243,51 @@ def f_func(x, k):
 	return p
 
 
-def generateKeys(key10bit):
-	# generate K1, K2 
+def generateKeys(key80bit):
+    
+	# generate K1, K2, K3
+    pts = ''
+    tmp = ""
+    for i in key80bit:
+        tmp+=i
+        if len(tmp)==10:
+            # permutate
+            pts+=p10(tmp)
+            tmp = ""
 
-	# permutate
-	perm10 = p10(key10bit)
-
-	first5 = perm10[:5]
-	last5 = perm10[5:]
+	first = perm10[:40]
+	last = perm10[40:]
 
 	# shift left and find k1
-	shifted_first = left_shift(first5)
-	shifted_last = left_shift(last5)
+	shifted_first = left_shift(first)
+	shifted_last = left_shift(last)
 
-	k1 = p8(shifted_first + shifted_last)
+	k1 = (shifted_first + shifted_last)
 
-	# shift left again and find k2
+    # shift left and find k2
 	shifted_first = left_shift(shifted_first)
 	shifted_last = left_shift(shifted_last)
 
-	k2 = p8(shifted_first + shifted_last)
+	shifted_first = left_shift(shifted_first)
+	shifted_last = left_shift(shifted_last)
 
-	return k1, k2
+	k2 = (shifted_first + shifted_last)
+
+    shifted_first = left_shift(shifted_first)
+	shifted_last = left_shift(shifted_last)
+
+	k3 = (shifted_first + shifted_last)
+
+	return k1, k2, k3
 
 
 
-def encrypt(plaintext, k1, k2):
+def encrypt(plaintext, k, rounds):
+
+    k1, k2, k3 = generateKeys(k)
+
+    
+
     listobits = []
     tmp = ""
     for i in plaintext:
@@ -283,7 +302,7 @@ def encrypt(plaintext, k1, k2):
 
     cipher1 = ""
     for i in listobits:
-        cipher1 += encrypt64(i, k1, k2)
+        cipher1 += encrypt64(i, k1)
 
 
 
@@ -302,7 +321,7 @@ def encrypt(plaintext, k1, k2):
 
     cipher2 = ""
     for i in listobits:
-        cipher2 += encrypt64(i, k1, k2)
+        cipher2 += encrypt64(i, k2)
 
 
 
@@ -322,14 +341,14 @@ def encrypt(plaintext, k1, k2):
 
     cipher3 = ""
     for i in listobits:
-        cipher3 += encrypt64(i, k1, k2)
+        cipher3 += encrypt64(i, k3)
 
 
     print("Here is the encrypted cipher text:\n"+cipher3)
     return cipher3
 
 
-def encrypt64(bits64, k1, k2):
+def encrypt64(bits64, k):
     # implement initial permutation
 	permutation = initPermute(bits64)
 
@@ -338,7 +357,7 @@ def encrypt64(bits64, k1, k2):
 	last32 = permutation[32:]
 
 	# send the latter to the f function with first key
-	f_last32 = f_func(last32, k1)
+	f_last32 = f_func(last32, k)
 
 	# xor new value with key after converting to int base 2
 	xor1 = int(first32,2) ^ int(f_last32,2) 
@@ -358,7 +377,10 @@ def encrypt64(bits64, k1, k2):
 	return initPermute(final)
 
 
-def decrypt(cipher, k1, k2):
+def decrypt(cipher, k, rounds):
+
+    k1, k2, k3 = generateKeys(k)
+
     tmp = ""
     listobits = []
     
@@ -370,7 +392,7 @@ def decrypt(cipher, k1, k2):
 
     plaintext1 = ""
     for i in listobits:
-        plaintext1 += decrypt64(i, k1, k2)
+        plaintext1 += decrypt64(i, k3)
 
 
 
@@ -386,7 +408,7 @@ def decrypt(cipher, k1, k2):
 
     plaintext2 = ""
     for i in listobits:
-        plaintext2 += decrypt64(i, k1, k2)
+        plaintext2 += decrypt64(i, k2)
 
 
 
@@ -401,12 +423,12 @@ def decrypt(cipher, k1, k2):
 
     plaintext3 = ""
     for i in listobits:
-        plaintext3 += decrypt64(i, k1, k2)
+        plaintext3 += decrypt64(i, k1)
 
     print("Here is the decrypted plain text:\n"+plaintext3)
     return plaintext3
 
-def decrypt64(bits64, k1, k2):
+def decrypt64(bits64, k):
     # implement initial permutation
 	permutation = initPermute(bits64)
 
@@ -415,7 +437,7 @@ def decrypt64(bits64, k1, k2):
 	last32 = permutation[32:]
 
 	# send the latter to the f function with second key
-	f_last32 = f_func(last32, k2)
+	f_last32 = f_func(last32, k)
 
 	# xor new value with key after converting to int base 2
 	xor1 = int(first32,2) ^ int(f_last32,2) 
