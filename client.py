@@ -4,7 +4,7 @@ import socket
 import secrets
 
 def keyExchangePicker():
-    keyExchangeList = ['staticdiffiehellman', 'ephemeraldiffiehellman', 'rsakeyexchange']
+    keyExchangeList = ['staticdiffiehellman', 'ephemeraldiffiehellman', 'rsakeygeneration']
     choices = ['0', '0', '0']
     while(True):
         keyExchangeChoice = input("Pick a keyExchange method ()[quit to exit]: ")
@@ -17,14 +17,14 @@ def keyExchangePicker():
             choices[0] = '1'
         elif keyExchangeChoice == 'ephemeraldiffiehellman':
             choices[1] = '1'
-        elif keyExchangeChoice == 'rsakeyexchange':
+        elif keyExchangeChoice == 'rsakeygeneration':
             choices[2] = '1'
         else:
             print("Invalid Key Exchange Algorithm")
 
 
 def cipherSuitePicker():
-    cipherSuiteList = ['des3', 'des', 'rsa']
+    cipherSuiteList = ['des3', 'des', 'textbookrsa']
     choices = ['0','0','0']
     while(True):
         cipherSuite = input("Pick a cipher suite ()[quit to exit]: ")
@@ -37,7 +37,7 @@ def cipherSuitePicker():
             choices[0] = '1'
         elif cipherSuite == 'des':
             choices[1] = '1'
-        elif cipherSuite == 'rsa':
+        elif cipherSuite == 'textbookrsa':
             choices[2] = '1'
         else:
             print("Invalid Cipher Suite Algorithm")
